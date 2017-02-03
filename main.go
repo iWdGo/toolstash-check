@@ -65,7 +65,7 @@ func main() {
 
 	envPath := os.Getenv("PATH")
 	if envPath != "" {
-		envPath = ":" + envPath
+		envPath = os.PathListSeparator + envPath
 	}
 	must(os.Setenv("PATH", filepath.Join(tmproot, "bin")+envPath))
 	must(os.Setenv("GOROOT", tmproot))
