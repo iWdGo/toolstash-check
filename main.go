@@ -18,7 +18,9 @@ import (
 )
 
 var (
-	flagAll = flag.Bool("all", false, "build for all GOOS/GOARCH platforms")
+	flagAll  = flag.Bool("all", false, "build for all GOOS/GOARCH platforms")
+	flagRace = flag.Bool("race", false, "build with -race")
+	flagWork = flag.Bool("work", false, "build with -work")
 )
 
 func usage() {
@@ -29,6 +31,17 @@ func usage() {
 func main() {
 	flag.Usage = usage
 	flag.Parse()
+
+	if *flagAll {
+		if *flagRace {
+			log.Fatal("-all and -race are incompatible")
+			os.Exit(2)
+		}
+		if *flagWork {
+			log.Fatal("-all and -work are incompatible")
+			os.Exit(2)
+		}
+	}
 
 	spec := "HEAD"
 	switch flag.NArg() {
@@ -80,7 +93,15 @@ func main() {
 	if *flagAll {
 		must(command(filepath.Join(pkg.Dir, "buildall")).Run())
 	} else {
-		must(command("go", "build", "-a", "-toolexec", "toolstash -cmp", "std", "cmd").Run())
+		buildArgs := []string{"build", "-a"}
+		if *flagRace {
+			buildArgs = append(buildArgs, "-race")
+		}
+		if *flagWork {
+			buildArgs = append(buildArgs, "-work")
+		}
+		buildArgs = append(buildArgs, "-toolexec", "toolstash -cmp", "std", "cmd")
+		must(command("go", buildArgs...).Run())
 	}
 
 	fmt.Println("toolstash-check passed for " + commit)
