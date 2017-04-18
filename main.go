@@ -72,6 +72,8 @@ func main() {
 	cmd.Dir = tmproot
 	must(cmd.Run())
 
+	must(ioutil.WriteFile(filepath.Join(tmproot, "VERSION"), []byte("devel"), 0666))
+
 	cmd = command("./make.bash")
 	cmd.Dir = filepath.Join(tmproot, "src")
 	must(cmd.Run())
