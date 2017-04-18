@@ -18,9 +18,10 @@ import (
 )
 
 var (
-	flagAll  = flag.Bool("all", false, "build for all GOOS/GOARCH platforms")
-	flagRace = flag.Bool("race", false, "build with -race")
-	flagWork = flag.Bool("work", false, "build with -work")
+	flagAll    = flag.Bool("all", false, "build for all GOOS/GOARCH platforms")
+	flagRace   = flag.Bool("race", false, "build with -race")
+	flagRemake = flag.Bool("remake", false, "build new toolchain with make.bash instead of go install std cmd")
+	flagWork   = flag.Bool("work", false, "build with -work")
 )
 
 func usage() {
@@ -88,7 +89,13 @@ func main() {
 	cmd.Dir = tmproot
 	must(cmd.Run())
 
-	must(command("go", "install", "std", "cmd").Run())
+	if *flagRemake {
+		cmd = command("./make.bash")
+		cmd.Dir = filepath.Join(tmproot, "src")
+	} else {
+		cmd = command("go", "install", "std", "cmd")
+	}
+	must(cmd.Run())
 
 	if *flagAll {
 		must(command(filepath.Join(pkg.Dir, "buildall")).Run())
