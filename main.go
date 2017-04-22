@@ -122,13 +122,17 @@ func main() {
 		must(command("go", buildArgs...).Run())
 	}
 
-	fmt.Println("toolstash-check passed for " + commit)
+	revs := commit
+	if *flagBase != "" {
+		revs = base + ".." + commit
+	}
+	fmt.Println("toolstash-check passed for", revs)
 }
 
 // revParse runs "git rev-parse $spec" in $GOROOT to parse a Git
 // revision specifier.
 func revParse(dir, spec string) (string, error) {
-	cmd := exec.Command("git", "rev-parse", spec)
+	cmd := exec.Command("git", "rev-parse", "--short", spec)
 	cmd.Dir = dir
 	out, err := cmd.Output()
 	if err != nil {
