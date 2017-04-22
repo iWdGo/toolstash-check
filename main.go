@@ -19,6 +19,7 @@ import (
 
 var (
 	flagAll    = flag.Bool("all", false, "build for all GOOS/GOARCH platforms")
+	flagBase   = flag.String("base", "", "revision to compare against")
 	flagRace   = flag.Bool("race", false, "build with -race")
 	flagRemake = flag.Bool("remake", false, "build new toolchain with make.bash instead of go install std cmd")
 	flagWork   = flag.Bool("work", false, "build with -work")
@@ -55,7 +56,15 @@ func main() {
 	}
 
 	goroot := runtime.GOROOT()
+
 	commit, err := revParse(goroot, spec)
+	must(err)
+
+	base := *flagBase
+	if base == "" {
+		base = commit + "^"
+	}
+	base, err = revParse(goroot, base)
 	must(err)
 
 	pkg, err := build.Import("golang.org/x/tools/cmd/toolstash", "", build.FindOnly)
@@ -68,7 +77,7 @@ func main() {
 	tmproot := filepath.Join(tmpdir, "go")
 	must(command("git", "clone", goroot, tmproot).Run())
 
-	cmd := command("git", "checkout", commit+"^")
+	cmd := command("git", "checkout", base)
 	cmd.Dir = tmproot
 	must(cmd.Run())
 
