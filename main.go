@@ -18,11 +18,12 @@ import (
 )
 
 var (
-	flagAll    = flag.Bool("all", false, "build for all GOOS/GOARCH platforms")
-	flagBase   = flag.String("base", "", "revision to compare against")
-	flagRace   = flag.Bool("race", false, "build with -race")
-	flagRemake = flag.Bool("remake", false, "build new toolchain with make.bash instead of go install std cmd")
-	flagWork   = flag.Bool("work", false, "build with -work")
+	flagAll     = flag.Bool("all", false, "build for all GOOS/GOARCH platforms")
+	flagBase    = flag.String("base", "", "revision to compare against")
+	flagGcflags = flag.String("gcflags", "", "additional flags to pass to compile")
+	flagRace    = flag.Bool("race", false, "build with -race")
+	flagRemake  = flag.Bool("remake", false, "build new toolchain with make.bash instead of go install std cmd")
+	flagWork    = flag.Bool("work", false, "build with -work")
 )
 
 func usage() {
@@ -41,6 +42,10 @@ func main() {
 		}
 		if *flagWork {
 			log.Fatal("-all and -work are incompatible")
+			os.Exit(2)
+		}
+		if *flagGcflags != "" {
+			log.Fatal("-all and -gcflags are incompatible")
 			os.Exit(2)
 		}
 	}
@@ -117,6 +122,9 @@ func main() {
 		}
 		if *flagWork {
 			buildArgs = append(buildArgs, "-work")
+		}
+		if *flagGcflags != "" {
+			buildArgs = append(buildArgs, "-gcflags", *flagGcflags)
 		}
 		buildArgs = append(buildArgs, "-toolexec", "toolstash -cmp", "std", "cmd")
 		must(command("go", buildArgs...).Run())
