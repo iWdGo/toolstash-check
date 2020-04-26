@@ -60,6 +60,7 @@ func main() {
 		flag.Usage()
 		os.Exit(2)
 	}
+	log.Printf("spec is %s\n", spec)
 
 	goroot := runtime.GOROOT()
 	if *flagVerbose {
