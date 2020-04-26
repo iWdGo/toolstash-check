@@ -69,7 +69,7 @@ func main() {
 		log.Printf("using GOROOT=%s\n", goroot)
 	}
 
-	commit, err := revParse(goroot, spec)
+	commit, err := revParse("", spec)
 	must(err)
 	if *flagVerbose {
 		log.Printf("git rev-parse returned %s\n", commit)
