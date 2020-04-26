@@ -23,8 +23,8 @@ var (
 	flagGcflags = flag.String("gcflags", "", "additional flags to pass to compile")
 	flagRace    = flag.Bool("race", false, "build with -race")
 	flagRemake  = flag.Bool("remake", false, "build new toolchain with make.bash instead of go install std cmd")
+	flagVerbose = flag.Bool("v", false, "log steps and parameters")
 	flagWork    = flag.Bool("work", false, "build with -work")
-	flagVerbose = flag.Bool("verbose", false, "log steps and parameters")
 )
 
 func usage() {
