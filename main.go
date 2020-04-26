@@ -24,6 +24,7 @@ var (
 	flagRace    = flag.Bool("race", false, "build with -race")
 	flagRemake  = flag.Bool("remake", false, "build new toolchain with make.bash instead of go install std cmd")
 	flagWork    = flag.Bool("work", false, "build with -work")
+	flagVerbose = flag.Bool("verbose", false, "log steps and parameters")
 )
 
 func usage() {
@@ -61,9 +62,15 @@ func main() {
 	}
 
 	goroot := runtime.GOROOT()
+	if *flagVerbose {
+		log.Printf("using GOROOT=%s\n", goroot)
+	}
 
 	commit, err := revParse(goroot, spec)
 	must(err)
+	if *flagVerbose {
+		log.Printf("git rev-parse returned %s\n", commit)
+	}
 
 	base := *flagBase
 	if base == "" {
@@ -71,16 +78,28 @@ func main() {
 	}
 	base, err = revParse(goroot, base)
 	must(err)
+	if *flagVerbose {
+		log.Printf("using base %s", base)
+	}
 
 	pkg, err := build.Import("golang.org/x/tools/cmd/toolstash", "", build.FindOnly)
 	must(err)
+	if *flagVerbose {
+		log.Printf("%s built\n", pkg.Name)
+	}
 
 	tmpdir, err := ioutil.TempDir("", "toolstash-check-")
 	must(err)
 	defer os.RemoveAll(tmpdir)
+	if *flagVerbose {
+		log.Printf("temporary directory is %s\n", tmpdir)
+	}
 
 	tmproot := filepath.Join(tmpdir, "go")
 	must(command("git", "clone", goroot, tmproot).Run())
+	if *flagVerbose {
+		log.Printf("git clone %s\n", tmpdir)
+	}
 
 	cmd := command("git", "checkout", base)
 	cmd.Dir = tmproot
