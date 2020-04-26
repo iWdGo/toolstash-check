@@ -23,6 +23,7 @@ var (
 	flagGcflags = flag.String("gcflags", "", "additional flags to pass to compile")
 	flagRace    = flag.Bool("race", false, "build with -race")
 	flagRemake  = flag.Bool("remake", false, "build new toolchain with make.bash instead of go install std cmd")
+	flagRepo    = flag.String("repo", runtime.GOROOT(), "set repo location. Default is GOROOT")
 	flagVerbose = flag.Bool("v", false, "log steps and parameters")
 	flagWork    = flag.Bool("work", false, "build with -work")
 )
@@ -64,12 +65,12 @@ func main() {
 		log.Printf("spec is %s\n", spec)
 	}
 
-	goroot := runtime.GOROOT()
+	goroot := *flagRepo
 	if *flagVerbose {
-		log.Printf("using GOROOT=%s\n", goroot)
+		log.Printf("repository is %s\n", goroot)
 	}
 
-	commit, err := revParse("", spec)
+	commit, err := revParse(goroot, spec)
 	must(err)
 	if *flagVerbose {
 		log.Printf("git rev-parse returned %s\n", commit)
@@ -79,7 +80,7 @@ func main() {
 	if base == "" {
 		base = commit + "^"
 	}
-	base, err = revParse("", base)
+	base, err = revParse(goroot, base)
 	must(err)
 	if *flagVerbose {
 		log.Printf("using base %s", base)
