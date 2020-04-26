@@ -79,7 +79,7 @@ func main() {
 	if base == "" {
 		base = commit + "^"
 	}
-	base, err = revParse(goroot, base)
+	base, err = revParse("", base)
 	must(err)
 	if *flagVerbose {
 		log.Printf("using base %s", base)
