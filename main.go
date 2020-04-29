@@ -89,7 +89,7 @@ func main() {
 	pkg, err := build.Import("golang.org/x/tools/cmd/toolstash", "", build.FindOnly)
 	must(err)
 	if *flagVerbose {
-		log.Printf("%s built\n", pkg.Name)
+		log.Printf("%s built\n", pkg.Root)
 	}
 
 	tmpdir, err := ioutil.TempDir("", "toolstash-check-")
