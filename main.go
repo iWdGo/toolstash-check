@@ -29,7 +29,7 @@ var (
 )
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: toolstash-check [options] [commit]")
+	_, _ = fmt.Fprintln(os.Stderr, "usage: toolstash-check [options] [commit]")
 	flag.PrintDefaults()
 }
 
@@ -40,15 +40,12 @@ func main() {
 	if *flagAll {
 		if *flagRace {
 			log.Fatal("-all and -race are incompatible")
-			os.Exit(2)
 		}
 		if *flagWork {
 			log.Fatal("-all and -work are incompatible")
-			os.Exit(2)
 		}
 		if *flagGcflags != "" {
 			log.Fatal("-all and -gcflags are incompatible")
-			os.Exit(2)
 		}
 	}
 
@@ -95,9 +92,6 @@ func main() {
 	tmpdir, err := ioutil.TempDir("", "toolstash-check-")
 	must(err)
 	defer os.RemoveAll(tmpdir)
-	if *flagVerbose {
-		log.Printf("temporary directory is %s\n", tmpdir)
-	}
 
 	tmproot := filepath.Join(tmpdir, "go")
 	must(command("git", "clone", goroot, tmproot).Run())
